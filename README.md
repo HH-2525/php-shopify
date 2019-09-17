@@ -1,6 +1,6 @@
 # PHP Shopify SDK
 
-[![Build Status](https://travis-ci.org/phpclassic/php-shopify.svg?branch=master)](https://travis-ci.org/phpclassic/php-shopify) [![Total Downloads](https://poser.pugx.org/phpclassic/php-shopify/downloads)](https://packagist.org/packages/phpclassic/php-shopify) [![Latest Stable Version](https://poser.pugx.org/phpclassic/php-shopify/v/stable)](https://packagist.org/packages/phpclassic/php-shopify) [![Latest Unstable Version](https://poser.pugx.org/phpclassic/php-shopify/v/unstable)](https://packagist.org/packages/phpclassic/php-shopify) [![License](https://poser.pugx.org/phpclassic/php-shopify/license)](https://packagist.org/packages/phpclassic/php-shopify)
+[![Build Status](https://travis-ci.org/phpclassic/php-shopify.svg?branch=master)](https://travis-ci.org/phpclassic/php-shopify) [![Monthly Downloads](https://poser.pugx.org/phpclassic/php-shopify/d/monthly)](https://packagist.org/packages/phpclassic/php-shopify) [![Total Downloads](https://poser.pugx.org/phpclassic/php-shopify/downloads)](https://packagist.org/packages/phpclassic/php-shopify) [![Latest Stable Version](https://poser.pugx.org/phpclassic/php-shopify/v/stable)](https://packagist.org/packages/phpclassic/php-shopify) [![Latest Unstable Version](https://poser.pugx.org/phpclassic/php-shopify/v/unstable)](https://packagist.org/packages/phpclassic/php-shopify) [![License](https://poser.pugx.org/phpclassic/php-shopify/license)](https://packagist.org/packages/phpclassic/php-shopify) [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ME9N6M2B87XT4&currency_code=USD&source=url)
 
 PHPShopify is a simple SDK implementation of Shopify API. It helps accessing the API in an object oriented way. 
 
@@ -153,6 +153,9 @@ $order = array (
 $shopify->Order->post($order);
 ```
 
+> Note that you don't need to wrap the data array with the resource key (`order` in this case), which is the expected syntax from Shopify API. This is automatically handled by this SDK.
+
+
 - Update an order (PUT Request)
 
 ```php
@@ -231,6 +234,32 @@ $shopify->Blog($blogID)->Article($articleID)->put($updateArtilceInfo);
 $blogArticle = $shopify->Blog($blogID)->Article($articleID)->delete();
 ```
 
+### GraphQL <sup>*v1.1*</sup>
+The GraphQL Admin API is a GraphQL-based alternative to the REST-based Admin API, and makes the functionality of the Shopify admin available at a single GraphQL endpoint. The full set of supported types can be found in the [GraphQL Admin API reference](https://help.shopify.com/en/api/graphql-admin-api/reference).
+You can simply call the GraphQL resource and make a post request with a GraphQL string:
+
+> The GraphQL Admin API requires an access token for making authenticated requests. You can obtain an access token either by creating a private app and using that app's API password, or by following the OAuth authorization process. See [GraphQL Authentication Guide](https://help.shopify.com/en/api/graphql-admin-api/getting-started#authentication)
+
+```php
+$graphQL = <<<Query
+query {
+  shop {
+    name
+    primaryDomain {
+      url
+      host
+    }
+  }
+}
+Query;
+
+$data = $shopify->GraphQL->post($graphQL);
+```
+
+##### GraphQL Builder
+This SDK only accepts a GraphQL string as input. You can build your GraphQL from [Shopify GraphQL Builder](https://help.shopify.com/en/api/graphql-admin-api/graphiql-builder)
+
+
 ### Resource Mapping
 Some resources are available directly, some resources are only available through parent resources and a few resources can be accessed both ways. It is recommended that you see the details in the related Shopify API Reference page about each resource. Each resource name here is linked to related Shopify API Reference page.
 > Use the resources only by listed resource map. Trying to get a resource directly which is only available through parent resource may end up with errors.
@@ -249,21 +278,26 @@ Some resources are available directly, some resources are only available through
 - Comment -> [Event](https://help.shopify.com/api/reference/event/)
 - [Country](https://help.shopify.com/api/reference/country/)
 - Country -> [Province](https://help.shopify.com/api/reference/province/)
+- [Currency](https://help.shopify.com/en/api/reference/store-properties/currency)
 - [CustomCollection]()
 - CustomCollection -> [Event](https://help.shopify.com/api/reference/event/)
 - CustomCollection -> [Metafield](https://help.shopify.com/api/reference/metafield)
 - [Customer](https://help.shopify.com/api/reference/customer/)
 - Customer -> [Address](https://help.shopify.com/api/reference/customeraddress/)
 - Customer -> [Metafield](https://help.shopify.com/api/reference/metafield)
+- Customer -> [Order](https://help.shopify.com/api/reference/order)
 - [CustomerSavedSearch](https://help.shopify.com/api/reference/customersavedsearch/)
 - CustomerSavedSearch -> [Customer](https://help.shopify.com/api/reference/customer/)
+- [DraftOrder](https://help.shopify.com/api/reference/draftorder)
 - [Discount](https://help.shopify.com/api/reference/discount) _(Shopify Plus Only)_
+- [DiscountCode](https://help.shopify.com/en/api/reference/discounts/discountcode)
 - [Event](https://help.shopify.com/api/reference/event/)
 - [FulfillmentService](https://help.shopify.com/api/reference/fulfillmentservice)
 - [GiftCard](https://help.shopify.com/api/reference/gift_card) _(Shopify Plus Only)_
 - [InventoryItem](https://help.shopify.com/api/reference/inventoryitem)
 - [InventoryLevel](https://help.shopify.com/api/reference/inventorylevel)
 - [Location](https://help.shopify.com/api/reference/location/) _(read only)_
+- Location -> [InventoryLevel](https://help.shopify.com/api/reference/inventorylevel)
 - [Metafield](https://help.shopify.com/api/reference/metafield)
 - [Multipass](https://help.shopify.com/api/reference/multipass) _(Shopify Plus Only, API not available yet)_
 - [Order](https://help.shopify.com/api/reference/order)
@@ -299,6 +333,7 @@ Some resources are available directly, some resources are only available through
 - Theme -> [Asset](https://help.shopify.com/api/reference/asset/)
 - [User](https://help.shopify.com/api/reference/user) _(read only, Shopify Plus Only)_
 - [Webhook](https://help.shopify.com/api/reference/webhook)
+- [GraphQL](https://help.shopify.com/en/api/graphql-admin-api/reference)
 
 ### Custom Actions
 There are several action methods which can be called without calling the `get()`, `post()`, `put()`, `delete()` methods directly, but eventually results in a custom call to one of those methods.
@@ -341,6 +376,8 @@ The custom methods are specific to some resources which may not be available for
 - Customer ->
     - [search()](https://help.shopify.com/api/reference/customer#search)
     Search for customers matching supplied query
+    - [send_invite($data)](https://help.shopify.com/en/api/reference/customers/customer#send_invite)
+    Sends an account invite to a customer.
     
 - Customer -> Address ->
     - [makeDefault()](https://help.shopify.com/api/reference/customeraddress#default)
@@ -348,11 +385,21 @@ The custom methods are specific to some resources which may not be available for
     - [set($params)](https://help.shopify.com/api/reference/customeraddress#set)
     Perform bulk operations against a number of addresses
     
+- DraftOrder ->
+    - [send_invoice($data)]()
+    Send the invoice for a DraftOrder
+    - [complete($data)]()
+    Complete a DraftOrder
+    
 - Discount ->
     - [enable()]()
     Enable a discount
     - [disable()]()
     Disable a discount
+    
+- DiscountCode ->
+    - [lookup($data)]()
+    Retrieves the location of a discount code.    
     
 - Fulfillment ->
     - [complete()](https://help.shopify.com/api/reference/fulfillment#complete)
@@ -408,3 +455,79 @@ The custom methods are specific to some resources which may not be available for
 
 ## Reference
 - [Shopify API Reference](https://help.shopify.com/api/reference/)
+
+## Donation
+If this project help you reduce time to develop, you can donate any amount, which will help us to devote more hours to this project and ensure more frequent updates.
+
+[![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ME9N6M2B87XT4&currency_code=USD&source=url) 
+
+## Backers
+
+Support us with a monthly donation and help us continue our activities. [[Become a backer](https://opencollective.com/phpshopify#backer)]
+
+<a href="https://opencollective.com/phpshopify/backer/0/website" target="_blank"><img src="https://opencollective.com/phpshopify/backer/0/avatar.svg"></a>
+<a href="https://opencollective.com/phpshopify/backer/1/website" target="_blank"><img src="https://opencollective.com/phpshopify/backer/1/avatar.svg"></a>
+<a href="https://opencollective.com/phpshopify/backer/2/website" target="_blank"><img src="https://opencollective.com/phpshopify/backer/2/avatar.svg"></a>
+<a href="https://opencollective.com/phpshopify/backer/3/website" target="_blank"><img src="https://opencollective.com/phpshopify/backer/3/avatar.svg"></a>
+<a href="https://opencollective.com/phpshopify/backer/4/website" target="_blank"><img src="https://opencollective.com/phpshopify/backer/4/avatar.svg"></a>
+<a href="https://opencollective.com/phpshopify/backer/5/website" target="_blank"><img src="https://opencollective.com/phpshopify/backer/5/avatar.svg"></a>
+<a href="https://opencollective.com/phpshopify/backer/6/website" target="_blank"><img src="https://opencollective.com/phpshopify/backer/6/avatar.svg"></a>
+<a href="https://opencollective.com/phpshopify/backer/7/website" target="_blank"><img src="https://opencollective.com/phpshopify/backer/7/avatar.svg"></a>
+<a href="https://opencollective.com/phpshopify/backer/8/website" target="_blank"><img src="https://opencollective.com/phpshopify/backer/8/avatar.svg"></a>
+<a href="https://opencollective.com/phpshopify/backer/9/website" target="_blank"><img src="https://opencollective.com/phpshopify/backer/9/avatar.svg"></a>
+<a href="https://opencollective.com/phpshopify/backer/10/website" target="_blank"><img src="https://opencollective.com/phpshopify/backer/10/avatar.svg"></a>
+<a href="https://opencollective.com/phpshopify/backer/11/website" target="_blank"><img src="https://opencollective.com/phpshopify/backer/11/avatar.svg"></a>
+<a href="https://opencollective.com/phpshopify/backer/12/website" target="_blank"><img src="https://opencollective.com/phpshopify/backer/12/avatar.svg"></a>
+<a href="https://opencollective.com/phpshopify/backer/13/website" target="_blank"><img src="https://opencollective.com/phpshopify/backer/13/avatar.svg"></a>
+<a href="https://opencollective.com/phpshopify/backer/14/website" target="_blank"><img src="https://opencollective.com/phpshopify/backer/14/avatar.svg"></a>
+<a href="https://opencollective.com/phpshopify/backer/15/website" target="_blank"><img src="https://opencollective.com/phpshopify/backer/15/avatar.svg"></a>
+<a href="https://opencollective.com/phpshopify/backer/16/website" target="_blank"><img src="https://opencollective.com/phpshopify/backer/16/avatar.svg"></a>
+<a href="https://opencollective.com/phpshopify/backer/17/website" target="_blank"><img src="https://opencollective.com/phpshopify/backer/17/avatar.svg"></a>
+<a href="https://opencollective.com/phpshopify/backer/18/website" target="_blank"><img src="https://opencollective.com/phpshopify/backer/18/avatar.svg"></a>
+<a href="https://opencollective.com/phpshopify/backer/19/website" target="_blank"><img src="https://opencollective.com/phpshopify/backer/19/avatar.svg"></a>
+<a href="https://opencollective.com/phpshopify/backer/20/website" target="_blank"><img src="https://opencollective.com/phpshopify/backer/20/avatar.svg"></a>
+<a href="https://opencollective.com/phpshopify/backer/21/website" target="_blank"><img src="https://opencollective.com/phpshopify/backer/21/avatar.svg"></a>
+<a href="https://opencollective.com/phpshopify/backer/22/website" target="_blank"><img src="https://opencollective.com/phpshopify/backer/22/avatar.svg"></a>
+<a href="https://opencollective.com/phpshopify/backer/23/website" target="_blank"><img src="https://opencollective.com/phpshopify/backer/23/avatar.svg"></a>
+<a href="https://opencollective.com/phpshopify/backer/24/website" target="_blank"><img src="https://opencollective.com/phpshopify/backer/24/avatar.svg"></a>
+<a href="https://opencollective.com/phpshopify/backer/25/website" target="_blank"><img src="https://opencollective.com/phpshopify/backer/25/avatar.svg"></a>
+<a href="https://opencollective.com/phpshopify/backer/26/website" target="_blank"><img src="https://opencollective.com/phpshopify/backer/26/avatar.svg"></a>
+<a href="https://opencollective.com/phpshopify/backer/27/website" target="_blank"><img src="https://opencollective.com/phpshopify/backer/27/avatar.svg"></a>
+<a href="https://opencollective.com/phpshopify/backer/28/website" target="_blank"><img src="https://opencollective.com/phpshopify/backer/28/avatar.svg"></a>
+<a href="https://opencollective.com/phpshopify/backer/29/website" target="_blank"><img src="https://opencollective.com/phpshopify/backer/29/avatar.svg"></a>
+
+
+## Sponsors
+
+Become a sponsor and get your logo on our README on Github with a link to your site. [[Become a sponsor](https://opencollective.com/phpshopify#sponsor)]
+
+<a href="https://opencollective.com/phpshopify/sponsor/0/website" target="_blank"><img src="https://opencollective.com/phpshopify/sponsor/0/avatar.svg"></a>
+<a href="https://opencollective.com/phpshopify/sponsor/1/website" target="_blank"><img src="https://opencollective.com/phpshopify/sponsor/1/avatar.svg"></a>
+<a href="https://opencollective.com/phpshopify/sponsor/2/website" target="_blank"><img src="https://opencollective.com/phpshopify/sponsor/2/avatar.svg"></a>
+<a href="https://opencollective.com/phpshopify/sponsor/3/website" target="_blank"><img src="https://opencollective.com/phpshopify/sponsor/3/avatar.svg"></a>
+<a href="https://opencollective.com/phpshopify/sponsor/4/website" target="_blank"><img src="https://opencollective.com/phpshopify/sponsor/4/avatar.svg"></a>
+<a href="https://opencollective.com/phpshopify/sponsor/5/website" target="_blank"><img src="https://opencollective.com/phpshopify/sponsor/5/avatar.svg"></a>
+<a href="https://opencollective.com/phpshopify/sponsor/6/website" target="_blank"><img src="https://opencollective.com/phpshopify/sponsor/6/avatar.svg"></a>
+<a href="https://opencollective.com/phpshopify/sponsor/7/website" target="_blank"><img src="https://opencollective.com/phpshopify/sponsor/7/avatar.svg"></a>
+<a href="https://opencollective.com/phpshopify/sponsor/8/website" target="_blank"><img src="https://opencollective.com/phpshopify/sponsor/8/avatar.svg"></a>
+<a href="https://opencollective.com/phpshopify/sponsor/9/website" target="_blank"><img src="https://opencollective.com/phpshopify/sponsor/9/avatar.svg"></a>
+<a href="https://opencollective.com/phpshopify/sponsor/10/website" target="_blank"><img src="https://opencollective.com/phpshopify/sponsor/10/avatar.svg"></a>
+<a href="https://opencollective.com/phpshopify/sponsor/11/website" target="_blank"><img src="https://opencollective.com/phpshopify/sponsor/11/avatar.svg"></a>
+<a href="https://opencollective.com/phpshopify/sponsor/12/website" target="_blank"><img src="https://opencollective.com/phpshopify/sponsor/12/avatar.svg"></a>
+<a href="https://opencollective.com/phpshopify/sponsor/13/website" target="_blank"><img src="https://opencollective.com/phpshopify/sponsor/13/avatar.svg"></a>
+<a href="https://opencollective.com/phpshopify/sponsor/14/website" target="_blank"><img src="https://opencollective.com/phpshopify/sponsor/14/avatar.svg"></a>
+<a href="https://opencollective.com/phpshopify/sponsor/15/website" target="_blank"><img src="https://opencollective.com/phpshopify/sponsor/15/avatar.svg"></a>
+<a href="https://opencollective.com/phpshopify/sponsor/16/website" target="_blank"><img src="https://opencollective.com/phpshopify/sponsor/16/avatar.svg"></a>
+<a href="https://opencollective.com/phpshopify/sponsor/17/website" target="_blank"><img src="https://opencollective.com/phpshopify/sponsor/17/avatar.svg"></a>
+<a href="https://opencollective.com/phpshopify/sponsor/18/website" target="_blank"><img src="https://opencollective.com/phpshopify/sponsor/18/avatar.svg"></a>
+<a href="https://opencollective.com/phpshopify/sponsor/19/website" target="_blank"><img src="https://opencollective.com/phpshopify/sponsor/19/avatar.svg"></a>
+<a href="https://opencollective.com/phpshopify/sponsor/20/website" target="_blank"><img src="https://opencollective.com/phpshopify/sponsor/20/avatar.svg"></a>
+<a href="https://opencollective.com/phpshopify/sponsor/21/website" target="_blank"><img src="https://opencollective.com/phpshopify/sponsor/21/avatar.svg"></a>
+<a href="https://opencollective.com/phpshopify/sponsor/22/website" target="_blank"><img src="https://opencollective.com/phpshopify/sponsor/22/avatar.svg"></a>
+<a href="https://opencollective.com/phpshopify/sponsor/23/website" target="_blank"><img src="https://opencollective.com/phpshopify/sponsor/23/avatar.svg"></a>
+<a href="https://opencollective.com/phpshopify/sponsor/24/website" target="_blank"><img src="https://opencollective.com/phpshopify/sponsor/24/avatar.svg"></a>
+<a href="https://opencollective.com/phpshopify/sponsor/25/website" target="_blank"><img src="https://opencollective.com/phpshopify/sponsor/25/avatar.svg"></a>
+<a href="https://opencollective.com/phpshopify/sponsor/26/website" target="_blank"><img src="https://opencollective.com/phpshopify/sponsor/26/avatar.svg"></a>
+<a href="https://opencollective.com/phpshopify/sponsor/27/website" target="_blank"><img src="https://opencollective.com/phpshopify/sponsor/27/avatar.svg"></a>
+<a href="https://opencollective.com/phpshopify/sponsor/28/website" target="_blank"><img src="https://opencollective.com/phpshopify/sponsor/28/avatar.svg"></a>
+<a href="https://opencollective.com/phpshopify/sponsor/29/website" target="_blank"><img src="https://opencollective.com/phpshopify/sponsor/29/avatar.svg"></a>

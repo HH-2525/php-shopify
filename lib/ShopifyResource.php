@@ -119,7 +119,7 @@ abstract class ShopifyResource
 
         $config = ShopifySDK::$config;
 
-        $this->resourceUrl = ($parentResourceUrl ? $parentResourceUrl . '/' :  $config['AdminUrl']) . $this->getResourcePath() . ($this->id ? '/' . $this->id : '');
+        $this->resourceUrl = ($parentResourceUrl ? $parentResourceUrl . '/' :  $config['ApiUrl']) . $this->getResourcePath() . ($this->id ? '/' . $this->id : '');
 
         if (isset($config['AccessToken'])) {
             $this->httpHeaders['X-Shopify-Access-Token'] = $config['AccessToken'];
@@ -446,7 +446,7 @@ abstract class ShopifyResource
      */
     protected function castString($array)
     {
-        if (is_string($array)) return $array;
+        if ( ! is_array($array)) return (string) $array;
 
         $string = '';
         $i = 0;
